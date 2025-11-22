@@ -1,0 +1,38 @@
+<% layout('layouts/boilerplate') %>
+<body>
+    <br>
+    <div class="row">
+    <div class="card col-8" style="width: auto;" >
+        
+  <img src="<%= listing.image %>" class="card-img-top showImg" alt="listing_image" style="width: 90vw; height: 50vh;object-fit: cover;">
+  <br>
+  <div class="card-body">
+     <h1><%= listing.title %></h1>
+         <p><%= listing.description %></p>
+         <p>
+  &#8377; 
+  <% if (listing.price != null) { %>
+    <%= listing.price.toLocaleString("en-IN") %>
+  <% } else { %>
+    N/A
+  <% } %>
+</p>
+         <p><%= listing.location %></p>
+         <p><%= listing.country %></p>
+        </div>
+
+        <div>
+         <form action="/listings/<%= listing._id %>/edit">
+             <button class="newBtn btn btn-primary">Edit the listing</button>
+         </form>
+         <br>
+         <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
+             <button class="newBtn btn btn-primary">Delete the listing</button>
+         </form>
+         
+        </div>
+  </div>
+</div>
+</div>
+     
+</body>

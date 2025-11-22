@@ -1,0 +1,62 @@
+<% layout('layouts/boilerplate') %>
+<body>
+  <h1 class="mt-5">Create New Listing</h1>
+  <br />
+  <form action="/listings" method="post" class="needs-validation" novalidate>
+    <div class="row">
+      <div>
+        <label for="title" class="form-label">Title</label>
+        <input type="text" name="title" id="title" class="form-control" placeholder="Title" required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a title</div>
+      </div>
+      <div>
+        <label for="description" class="form-label">Description</label>
+        <input
+          type="text"
+          name="description"
+          id="description"
+          class="form-control"
+          placeholder="Description"
+          required
+        />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a description</div>
+    </div>
+      <div>
+        <label for="image" class="form-label">Image(Optional)</label>
+        <input type="text" name="image" id="image" class="form-control" placeholder="Image URL" />
+        
+      </div>
+      <div class="col-4">
+        <label for="price" class="form-label">Price</label>
+        <input type="number" name="price" id="price" class="form-control" 
+        placeholder="Price"
+        required/>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a price</div>
+      </div>
+      <div class="col-8">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" name="location" id="location" class="form-control" 
+        placeholder="Location"
+        required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a location</div>
+      </div>
+      <div>
+        <label for="country" class="form-label">Country</label>
+        <input type="text" name="country" id="country" class="form-control" 
+        placeholder="Country"
+        required />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a country</div>
+
+        <br />
+      </div>
+    </div>
+    <button type="submit" class="btn newBtn btn-secondary">Submit</button>
+  </form>
+  <br />
+  <a href="/"><button class="btn newBtn btn-secondary">Back</button></a>
+</body>
