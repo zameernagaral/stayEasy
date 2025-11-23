@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const reviews = require('./reviews');
+const Review = require('./reviews');
 const Schema = mongoose.Schema;
 
 const listingSchema = new mongoose.Schema({
@@ -21,6 +21,16 @@ const listingSchema = new mongoose.Schema({
             ref: 'Review',
         },
     ],
+});
+
+listingSchema.post('findOneAndDelete', async(listing) => {
+    if (listing) {
+        await Review.deleteMany({
+            _id: {
+                $in: listing.reviews,
+            },
+        });
+    }
 });
 
 module.exports = mongoose.model('Listing', listingSchema);
