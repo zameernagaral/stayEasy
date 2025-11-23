@@ -78,11 +78,16 @@ footer a{
     text-decoration: none;
     color: #000;
 }
-.card{
+.listing-card{
     cursor: pointer;
     transition: all 0.3s ease-in-out;
      border: none !important;
      margin-bottom: 2rem;
+
+}
+.card{
+    border-radius: 12px !important;
+    padding: 1rem !important;
 
 }
 .card-img-top{
@@ -90,6 +95,10 @@ footer a{
     width: 100%;
     object-fit: cover !important;
 
+}
+.showImg{
+     height: 60vh;
+     object-fit:cover !important;
 }
 .card-body{
     padding: 0 !important;

@@ -8,7 +8,8 @@ const Mongo_URL = 'mongodb://127.0.0.1:27017/stayeasy';
 const ejsMate = require('ejs-mate');
 const wrapAsync = require('./utils/wrapAsync.js');
 const ExpressError = require('./utils/ExpressError.js');
-const { listingSchema } = require('./schema.js');
+const { listingSchema, reviewSchema } = require('./schema.js');
+const Review = require('./models/reviews.js');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -40,6 +41,15 @@ const validateListing = (req, res, next) => {
         next();
     }
 }
+const validateReview = (req, res, next) => {
+     let {error} = reviewSchema.validate(req.body);
+    if (error) {
+        let msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(400, msg);
+    } else {
+        next();
+    }
+}
 
 app.get('/listings', (req, res) => {
     Listing.find()
@@ -62,6 +72,19 @@ app.delete('/listings/:id', wrapAsync(async (req, res, next) => {
     await Listing.findByIdAndDelete(id);
     res.redirect('/listings');
 }))
+
+//reviews
+//post route
+app.post('/listings/:id/reviews',validateReview,wrapAsync(async (req, res, next) => {
+    let { id } = req.params;
+    let listing = await Listing.findById(id);
+    let newReview = new Review(req.body.review);
+    listing.reviews.push(newReview);
+    await newReview.save();
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`);
+
+}))
 app.get('/listings/:id/edit', wrapAsync(async (req, res, next) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
@@ -74,9 +97,11 @@ app.put('/listings/:id',validateListing, wrapAsync(async (req, res, next) => {
     const listing = await Listing.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
     res.redirect(`/listings/${listing._id}`);
 }))
+
+//Show Route
 app.get('/listings/:id', wrapAsync(async (req, res, next) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate('reviews');
     res.render('listings/show', { listing });
 }))
 
