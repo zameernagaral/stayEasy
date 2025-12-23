@@ -10,7 +10,10 @@ const wrapAsync = require('./utils/wrapAsync.js');
 const ExpressError = require('./utils/ExpressError.js');
 const { listingSchema, reviewSchema } = require('./schema.js');
 const Review = require('./models/reviews.js');
+
+
 const listings = require("./routes/listing");
+const reviews = require("./routes/review");
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -33,26 +36,10 @@ app.get('/', (req, res) => {
     res.redirect('/listings');
 });
 
-const validateListing = (req, res, next) => {
-     let {error} = listingSchema.validate(req.body);
-    if (error) {
-        let msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(400, msg);
-    } else {
-        next();
-    }
-}
-const validateReview = (req, res, next) => {
-     let {error} = reviewSchema.validate(req.body);
-    if (error) {
-        let msg = error.details.map(el => el.message).join(',');
-        throw new ExpressError(400, msg);
-    } else {
-        next();
-    }
-}
 
-app.use('/listings', listings);
+
+    app.use('/listings', listings);
+    app.use('/listings/:id/reviews', reviews);
 
 
 
