@@ -32,16 +32,21 @@ router.get('/', (req, res) => {
 router.get('/new', (req, res) => {
     res.render('listings/new');
 })
+
+//Create route
 router.post('/', validateListing, wrapAsync(async (req, res , next) => {
    
     const newlisting = new Listing(req.body.listing);
     await newlisting.save();
+    req.flash("success", "Successfully made a new listing");
     res.redirect(`/listings`);
 }));
 
+//delete route
 router.delete('/:id', wrapAsync(async (req, res, next) => {
     let { id } = req.params;
     await Listing.findByIdAndDelete(id);
+    req.flash("danger", "Successfully deleted a listing");
     res.redirect('/listings');
 }))
 
@@ -57,6 +62,7 @@ router.get('/:id/edit', wrapAsync(async (req, res, next) => {
 router.put('/:id',validateListing, wrapAsync(async (req, res, next) => {
     let { id } = req.params;
     const listing = await Listing.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+    req.flash("success", "Successfully updated a listing");
     res.redirect(`/listings/${listing._id}`);
 }))
 
