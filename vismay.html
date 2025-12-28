@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDT Master: Innovation & Design Thinking Guide</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: "Modern Sage" -->
+    <!-- Application Structure Plan: 
+         Structure: Dashboard-style single page app with a fixed sidebar navigation (collapsible on mobile) and a main content area.
+         Rationale: The report covers distinct but interconnected modules (Foundations, Tools, Strategy, Workshop). A tabbed/sectioned dashboard allows users to jump between concepts non-linearly, which is better for study/review than a long scrolling document.
+         Key Interactions: 
+         - Interactive "5 Stages" cycle (clicking a stage reveals details).
+         - "Toolbox" filterable grid for Module 2.
+         - Comparative toggle for Innovation Types (Module 4).
+         - "Workshop Planner" interactive checklist (Module 5).
+         - Dynamic "Cheat Sheet" quiz mode.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. 5 Stages: Interactive Cycle Diagram (CSS/JS) -> Click stage to see Goal/Tools/Phrase -> Explains the core iterative process better than static text.
+         2. Tools: Filterable Cards -> Filter by "Goal" (Inform, Organize, etc.) -> Helps users connect tool to purpose.
+         3. Innovation Types: Interactive Matrix (Plotly) -> Visualizes Disruptive/Sustaining vs Radical/Incremental -> Clarifies complex strategic concepts.
+         4. Workshop: Accordion/Step-through -> Walks through the timeline of a workshop -> Mirrors the chronological nature of the event.
+         5. Cheat Sheet: Flip Cards -> Question on front, Answer on back -> Active recall for exam prep.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        :root {
+            --color-bg: #F9FAFB;
+            --color-text-primary: #1F2937;
+            --color-text-secondary: #4B5563;
+            --color-accent: #059669; /* Emerald 600 */
+            --color-accent-light: #D1FAE5;
+            --color-card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Chart Container Styling as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Max width constraint */
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px; /* Base height */
+            max-height: 500px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Flip Card Styles for Cheat Sheet */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.5rem;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .flip-card-front {
+            background-color: #ffffff;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+        }
+        .flip-card-back {
+            background-color: #059669;
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Cycle Diagram Styles */
+        .cycle-stage {
+            transition: all 0.3s ease;
+        }
+        .cycle-stage:hover, .cycle-stage.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            border-color: #059669;
+        }
+        
+        .active-nav-item {
+            background-color: #D1FAE5;
+            color: #065F46;
+            border-right: 3px solid #059669;
+        }
+        /* Mobile menu slide-in */
+        .mobile-menu-panel {
+            transform: translateX(-16px);
+            transition: transform 240ms ease, opacity 180ms ease;
+        }
+        .mobile-menu-panel.open {
+            transform: translateX(0);
+        }
+        /* Slightly larger touch targets on mobile */
+        .nav-item, #mobile-menu-btn { cursor: pointer; }
+        .nav-item { padding-top: .75rem; padding-bottom: .75rem; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col z-20">
+        <div class="p-6 border-b border-gray-200">
+            <h1 class="text-xl font-bold text-emerald-700 flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb"></i> IDT Master
+            </h1>
+            <p class="text-xs text-gray-500 mt-1">Study Guide Companion</p>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <button onclick="showSection('dashboard')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors active-nav-item" id="nav-dashboard">
+                        <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('foundations')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors" id="nav-foundations">
+                        <i class="fa-solid fa-layer-group w-5"></i> 1. The 5 Stages
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('tools')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors" id="nav-tools">
+                        <i class="fa-solid fa-toolbox w-5"></i> 2. Design Tools
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('strategy')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors" id="nav-strategy">
+                        <i class="fa-solid fa-chess w-5"></i> 3. IT & Strategy
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('workshop')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors" id="nav-workshop">
+                        <i class="fa-solid fa-users-rectangle w-5"></i> 4. The Workshop
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('cheatsheet')" class="nav-item w-full text-left px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors" id="nav-cheatsheet">
+                        <i class="fa-solid fa-clipboard-question w-5"></i> 5. Exam Cheat Sheet
+                    </button>
+                </li>
+            </ul>
+        </nav>
+        <div class="p-4 border-t border-gray-200">
+            <div class="bg-emerald-50 rounded p-3 text-xs text-emerald-800">
+                <p class="font-bold">Exam Tip:</p>
+                <p class="mt-1" id="random-tip">Focus on the user, not the product.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <div class="md:hidden fixed top-0 w-full bg-white border-b border-gray-200 z-30 flex items-center justify-between px-4 h-16">
+        <h1 class="text-lg font-bold text-emerald-700">IDT Master</h1>
+        <button id="mobile-menu-btn" class="text-gray-600 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open menu" onclick="toggleMobileMenu()">
+            <i class="fa-solid fa-bars text-xl" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-gray-800 bg-opacity-75 z-40 hidden" role="dialog" aria-modal="true" aria-hidden="true" onclick="toggleMobileMenu()">
+        <div class="bg-white w-64 h-full shadow-lg flex flex-col mobile-menu-panel" role="menu" aria-label="Mobile navigation" onclick="event.stopPropagation()">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h2 class="font-bold text-gray-700">Menu</h2>
+                <button onclick="toggleMobileMenu()" class="text-gray-500"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <nav class="flex-1 py-4">
+                <ul class="space-y-1">
+                    <li><button onclick="showSection('dashboard'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">Dashboard</button></li>
+                    <li><button onclick="showSection('foundations'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">1. The 5 Stages</button></li>
+                    <li><button onclick="showSection('tools'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">2. Design Tools</button></li>
+                    <li><button onclick="showSection('strategy'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">3. IT & Strategy</button></li>
+                    <li><button onclick="showSection('workshop'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">4. The Workshop</button></li>
+                    <li><button onclick="showSection('cheatsheet'); toggleMobileMenu()" class="block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-50">5. Exam Cheat Sheet</button></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 h-full overflow-y-auto bg-gray-50 pt-16 md:pt-0 scroll-smooth" id="main-content">
+        
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard" class="p-6 md:p-10 max-w-7xl mx-auto block animate-fade-in">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome to IDT Master</h2>
+                <p class="text-gray-600 max-w-3xl">This interactive guide is designed to help you master Innovation and Design Thinking. Navigate through the modules to explore the core principles, tools, and strategic applications. Use the Cheat Sheet for rapid recall.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                <!-- Quick Stat Cards -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">The Core Process</h3>
+                            <p class="text-xs text-gray-500">5 Iterative Stages</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Design thinking is not linear. It loops through Empathy, Definition, Ideation, Prototyping, and Testing.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                            <i class="fa-solid fa-rocket"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">Innovation Strategy</h3>
+                            <p class="text-xs text-gray-500">Disruptive vs Sustaining</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Understand how Radical, Incremental, Architectural, and Modular innovations differ.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">The Workshop</h3>
+                            <p class="text-xs text-gray-500">Collaborative Solving</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">Master the flow from Planning to Closing a successful Design Thinking session.</p>
+                </div>
+            </div>
+
+            <!-- Visualization: Stages Overview -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Course Overview Distribution</h3>
+                <p class="text-sm text-gray-600 mb-4">This chart visualizes the relative focus areas of the study material.</p>
+                <div class="chart-container">
+                    <canvas id="overviewChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOUNDATIONS SECTION (5 STAGES) -->
+        <section id="foundations" class="p-6 md:p-10 max-w-7xl mx-auto hidden animate-fade-in">
+            <header class="mb-8">
+                <span class="text-emerald-600 font-semibold tracking-wider text-sm uppercase">Module 1</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-1">The 5 Stages of Design Thinking</h2>
+                <p class="text-gray-600 mt-2 max-w-3xl">The d.school model consists of five modes. Remember: this is an <strong>iterative</strong> process, not a strictly linear one. Click on each stage below to explore its goals and tools.</p>
+            </header>
+
+            <!-- Interactive 5 Stages Diagram -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-8">
+                <button onclick="selectStage('empathize')" class="cycle-stage p-4 rounded-lg bg-white border-2 border-gray-100 text-center hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 active" id="btn-empathize">
+                    <div class="w-10 h-10 mx-auto bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-heart"></i></div>
+                    <h3 class="font-bold text-gray-800">1. Empathize</h3>
+                </button>
+                <button onclick="selectStage('define')" class="cycle-stage p-4 rounded-lg bg-white border-2 border-gray-100 text-center hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" id="btn-define">
+                    <div class="w-10 h-10 mx-auto bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <h3 class="font-bold text-gray-800">2. Define</h3>
+                </button>
+                <button onclick="selectStage('ideate')" class="cycle-stage p-4 rounded-lg bg-white border-2 border-gray-100 text-center hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" id="btn-ideate">
+                    <div class="w-10 h-10 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h3 class="font-bold text-gray-800">3. Ideate</h3>
+                </button>
+                <button onclick="selectStage('prototype')" class="cycle-stage p-4 rounded-lg bg-white border-2 border-gray-100 text-center hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" id="btn-prototype">
+                    <div class="w-10 h-10 mx-auto bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-shapes"></i></div>
+                    <h3 class="font-bold text-gray-800">4. Prototype</h3>
+                </button>
+                <button onclick="selectStage('test')" class="cycle-stage p-4 rounded-lg bg-white border-2 border-gray-100 text-center hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" id="btn-test">
+                    <div class="w-10 h-10 mx-auto bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i class="fa-solid fa-check-double"></i></div>
+                    <h3 class="font-bold text-gray-800">5. Test</h3>
+                </button>
+            </div>
+
+            <!-- Dynamic Stage Detail Content -->
+            <div id="stage-content" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transition-all duration-300">
+                <!-- Content injected via JS -->
+            </div>
+
+            <div class="mt-8 bg-gray-100 p-6 rounded-lg border-l-4 border-emerald-500">
+                <h4 class="font-bold text-gray-800 mb-2">Core Principles</h4>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-user text-emerald-600 mt-1"></i> <span><strong>Human-Centric:</strong> Focuses on people (employees, customers).</span></li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-users text-emerald-600 mt-1"></i> <span><strong>Collaborative:</strong> Requires diverse teams and viewpoints.</span></li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-rotate-right text-emerald-600 mt-1"></i> <span><strong>Iterative:</strong> It is a cycle of prototyping, testing, and refining.</span></li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-person-running text-emerald-600 mt-1"></i> <span><strong>Action-Oriented:</strong> "Do" rather than just "Think".</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- TOOLS SECTION -->
+        <section id="tools" class="p-6 md:p-10 max-w-7xl mx-auto hidden animate-fade-in">
+            <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="text-emerald-600 font-semibold tracking-wider text-sm uppercase">Module 2</span>
+                    <h2 class="text-3xl font-bold text-gray-900 mt-1">Design Thinking Tools</h2>
+                    <p class="text-gray-600 mt-2">A toolbox for every stage of the process. Filter to find the right tool.</p>
+                </div>
+                <!-- Filter Controls -->
+                <div class="flex gap-2">
+                    <select id="tool-filter" onchange="filterTools()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5">
+                        <option value="all">All Goals</option>
+                        <option value="understand">Understand & Empathize</option>
+                        <option value="explore">Explore & Ideate</option>
+                        <option value="build">Build & Test</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="tools-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tool Cards injected via JS -->
+            </div>
+        </section>
+
+        <!-- STRATEGY & IT SECTION -->
+        <section id="strategy" class="p-6 md:p-10 max-w-7xl mx-auto hidden animate-fade-in">
+            <header class="mb-8">
+                <span class="text-emerald-600 font-semibold tracking-wider text-sm uppercase">Modules 3 & 4</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-1">Strategy & IT Integration</h2>
+                <p class="text-gray-600 mt-2 max-w-3xl">How Design Thinking merges with Business Process Management, Agile, and Strategic Innovation.</p>
+            </header>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+                <!-- Innovation Matrix Visualization -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Types of Innovation</h3>
+                    <p class="text-sm text-gray-500 mb-4">Understanding the difference between market impact and technology change.</p>
+                    <div class="chart-container">
+                        <div id="innovationMatrix" class="w-full h-full"></div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500 bg-gray-50 p-3 rounded">
+                        <p><strong>Note:</strong> Hover over the quadrants to see examples. Radical innovation changes both technology and business models, while Incremental improves existing ones.</p>
+                    </div>
+                </div>
+
+                <!-- Strategic Concepts Accordion -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <button onclick="toggleAccordion('acc-bpm')" class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50">
+                            <span>Business Process Modelling (BPM)</span>
+                            <i class="fa-solid fa-chevron-down transition-transform" id="icon-acc-bpm"></i>
+                        </button>
+                        <div id="acc-bpm" class="hidden px-6 py-4 bg-gray-50 border-t border-gray-100">
+                            <p class="text-sm text-gray-700 mb-2"><strong>Goal:</strong> Align operations with strategy, improve communication, consistency, and control.</p>
+                            <p class="text-sm text-gray-700"><strong>DT's Role:</strong> Moves BPM beyond simple maps to being <span class="text-emerald-600 font-bold">customer-centric</span> and empathy-driven.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <button onclick="toggleAccordion('acc-agile')" class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50">
+                            <span>Agile Methodology</span>
+                            <i class="fa-solid fa-chevron-down transition-transform" id="icon-acc-agile"></i>
+                        </button>
+                        <div id="acc-agile" class="hidden px-6 py-4 bg-gray-50 border-t border-gray-100">
+                            <p class="text-sm text-gray-700 mb-2"><strong>Core Value:</strong> Individuals and interactions <em>over</em> processes and tools. Iterative & incremental.</p>
+                            <p class="text-sm text-gray-700"><strong>Relationship:</strong> Design Thinking helps find the <span class="text-emerald-600 font-bold">right problems</span> to solve; Agile efficiently <span class="text-emerald-600 font-bold">solves</span> them.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <button onclick="toggleAccordion('acc-virtual')" class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50">
+                            <span>Virtual Collaboration</span>
+                            <i class="fa-solid fa-chevron-down transition-transform" id="icon-acc-virtual"></i>
+                        </button>
+                        <div id="acc-virtual" class="hidden px-6 py-4 bg-gray-50 border-t border-gray-100">
+                            <p class="text-sm text-gray-700 mb-2"><strong>Key Elements:</strong> Transparency, Culture of Courage (safe to fail), Strong Communication, Work-Life Balance.</p>
+                            <p class="text-sm text-gray-700"><strong>Context:</strong> Essential for modern distributed teams working across time zones and cultures.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <button onclick="toggleAccordion('acc-strat')" class="w-full px-6 py-4 text-left font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50">
+                            <span>Strategic Innovation Features</span>
+                            <i class="fa-solid fa-chevron-down transition-transform" id="icon-acc-strat"></i>
+                        </button>
+                        <div id="acc-strat" class="hidden px-6 py-4 bg-gray-50 border-t border-gray-100">
+                            <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                <li><strong>Goal:</strong> Competitive advantage & growth.</li>
+                                <li><strong>Scope:</strong> Managed innovation, Strategic alignment, Industry foresight.</li>
+                                <li><strong>DT Integration:</strong> Reviewing data, Simulating experiences, Conversing on strategy, Collaborating on solutions.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WORKSHOP SECTION -->
+        <section id="workshop" class="p-6 md:p-10 max-w-7xl mx-auto hidden animate-fade-in">
+            <header class="mb-8">
+                <span class="text-emerald-600 font-semibold tracking-wider text-sm uppercase">Module 5</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-1">The Design Thinking Workshop</h2>
+                <p class="text-gray-600 mt-2">A collaborative session to solve specific problems. Use the checklist below to understand the flow.</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3">
+                    <!-- Phase 1: Planning -->
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                            <h3 class="font-bold text-gray-800">Planning</h3>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Pre-meeting:</strong> Define the "Why".</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Ambience:</strong> Ensure environment fosters creativity.</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Goals:</strong> Define specific learning goals.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Phase 2: Conducting -->
+                    <div class="p-6 border-b md:border-b-0 md:border-r border-gray-200 bg-emerald-50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-emerald-200 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                            <h3 class="font-bold text-gray-800">Conducting</h3>
+                        </div>
+                        <div class="relative pl-4 border-l-2 border-emerald-200 space-y-4">
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <p class="text-sm font-semibold text-gray-800">Introduction</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <p class="text-sm font-semibold text-gray-800">Define Problem Statement</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <p class="text-sm font-semibold text-gray-800">Idea Testing (Brainstorming)</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <p class="text-sm font-semibold text-gray-800">Prototyping & Testing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: Closing -->
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                            <h3 class="font-bold text-gray-800">Closing</h3>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Feedback:</strong> Gather insights on the session.</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Next Steps:</strong> Define action items.</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                                <span><strong>Motivation:</strong> Encourage application of concepts.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHEAT SHEET SECTION -->
+        <section id="cheatsheet" class="p-6 md:p-10 max-w-7xl mx-auto hidden animate-fade-in">
+            <header class="mb-8 flex justify-between items-end">
+                <div>
+                    <span class="text-emerald-600 font-semibold tracking-wider text-sm uppercase">Exam Prep</span>
+                    <h2 class="text-3xl font-bold text-gray-900 mt-1">Rapid Recall Cheat Sheet</h2>
+                    <p class="text-gray-600 mt-2">Flip the cards to test your knowledge.</p>
+                </div>
+                <button onclick="resetCards()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                    Reset Cards
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="cheat-grid">
+                <!-- Cards injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data ---
+        
+        const stageData = {
+            empathize: {
+                title: "1. Empathize",
+                subtitle: "Seek to Understand",
+                color: "red",
+                content: "Understand the user's needs, feelings, pain points, and motivations. You must set aside your own assumptions (bias).",
+                tools: ["Interviews", "Shadowing/Observation", "Empathy Maps", "Body Language"],
+                phrase: "\"I feel your pain.\" / \"Put yourself in their shoes.\""
+            },
+            define: {
+                title: "2. Define",
+                subtitle: "The Problem Statement",
+                color: "yellow",
+                content: "Synthesize your findings into a clear, actionable Problem Statement. Create a 'Point of View' (POV).",
+                tools: ["Problem Statements", "POV Construction", "Affinity Diagrams"],
+                phrase: "\"This is the specific dragon we must slay.\""
+            },
+            ideate: {
+                title: "3. Ideate",
+                subtitle: "Generate Ideas",
+                color: "blue",
+                content: "Generate a wide range of ideas. Quantity over quality initially. No judgment allowed.",
+                tools: ["Brainstorming", "Mind Mapping", "SCAMPER"],
+                phrase: "\"Think outside the box.\" / \"Yes, and...\""
+            },
+            prototype: {
+                title: "4. Prototype",
+                subtitle: "Build to Think",
+                color: "purple",
+                content: "Create a tangible, scaled-down version of the solution to test ideas. Philosophy: Fail fast and cheap.",
+                tools: ["Low-fidelity (paper, sketches)", "High-fidelity (interactive)"],
+                phrase: "\"Show, don't just tell.\""
+            },
+            test: {
+                title: "5. Test",
+                subtitle: "The Reality Check",
+                color: "emerald",
+                content: "Put the prototype in front of real users to get feedback. Refine the solution or go back to previous stages.",
+                tools: ["User Testing", "Feedback Grids", "Observation"],
+                phrase: "\"Does this actually work for them?\""
+            }
+        };
+
+        const toolsData = [
+            { title: "Visualization", category: "understand", desc: "Using images/maps/stories instead of just text/numbers to make ideas real." },
+            { title: "Journey Mapping", category: "understand", desc: "Tracking the customer's end-to-end experience to identify emotional highs and lows." },
+            { title: "Value Chain Analysis", category: "explore", desc: "Analyzing how an organization partners to create value (production, marketing, distribution)." },
+            { title: "Mind Mapping", category: "explore", desc: "A visual diagram to organize and classify ideas, showing relationships." },
+            { title: "Rapid Concept Dev", category: "explore", desc: "Quickly generating multiple new business opportunities/concepts." },
+            { title: "Assumption Testing", category: "build", desc: "Identify and test the key assumptions underlying a new business idea (is it viable?)." },
+            { title: "Co-Creation", category: "build", desc: "Engaging the user directly in the design process to create the solution together." },
+            { title: "Learning Launches", category: "build", desc: "Small, quick experiments in the market to gather data." },
+            { title: "Storytelling", category: "understand", desc: "Using a narrative to make a solution compelling and relatable." }
+        ];
+
+        const cheatSheetData = [
+            { q: "Iterative method?", a: "Agile" },
+            { q: "DT's role in Agile?", a: "Finds the *right problems* to solve" },
+            { q: "Waterfall modification phase?", a: "Maintenance" },
+            { q: "Virtual Collaboration?", a: "Working remotely across continents/cultures" },
+            { q: "Agile does NOT include?", a: "Layoffs" },
+            { q: "BPM Benefits?", a: "Aligning strategy, Process view, Continuous learning" },
+            { q: "Website Redesign Priority?", a: "Student Log-in" },
+            { q: "Is DT linear?", a: "No, it is Iterative" },
+            { q: "DT Steps Order?", a: "Empathize -> Define -> Ideate -> Prototype -> Test" },
+            { q: "Prototype attributes?", a: "Fast and Cheap" },
+            { q: "Agile values?", a: "People over Process" },
+            { q: "Innovation Definition?", a: "Commercialization of a new product/process" }
+        ];
+
+        const tips = [
+            "Focus on the user, not the product.",
+            "Fail fast, fail cheap.",
+            "Design Thinking is iterative, not linear.",
+            "Empathy is the foundation of innovation.",
+            "\"Yes, and...\" keeps ideas flowing.",
+            "Prototypes are for testing, not for showing off."
+        ];
+
+        // --- Functions ---
+
+        function init() {
+            // Load Charts
+            renderOverviewChart();
+            renderInnovationMatrix();
+            
+            // Load Initial Content
+            selectStage('empathize'); // Default stage
+            renderTools('all');
+            renderCheatSheet();
+            
+            // Random Tip
+            document.getElementById('random-tip').textContent = tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected
+            const activeSection = document.getElementById(sectionId);
+            activeSection.classList.remove('hidden');
+            
+            // Update Nav State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-nav-item'));
+            document.getElementById(`nav-${sectionId}`).classList.add('active-nav-item');
+
+            // Scroll to top
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        function selectStage(stageKey) {
+            const data = stageData[stageKey];
+            const container = document.getElementById('stage-content');
+            
+            // Update Buttons
+            document.querySelectorAll('.cycle-stage').forEach(el => {
+                el.classList.remove('active', 'ring-2', 'ring-emerald-500', 'border-emerald-400');
+                el.classList.add('border-gray-100');
+            });
+            const activeBtn = document.getElementById(`btn-${stageKey}`);
+            activeBtn.classList.add('active', 'ring-2', 'ring-emerald-500', 'border-emerald-400');
+            activeBtn.classList.remove('border-gray-100');
+
+            // Inject Content
+            container.innerHTML = `
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="md:w-1/3 bg-${data.color}-50 p-8 border-r border-gray-100 flex flex-col justify-center">
+                        <span class="text-${data.color}-600 font-bold tracking-widest text-xs uppercase mb-2">Stage Phase</span>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-2">${data.title}</h3>
+                        <p class="text-${data.color}-700 font-medium text-lg">${data.subtitle}</p>
+                    </div>
+                    <div class="md:w-2/3 p-8">
+                        <div class="mb-6">
+                            <h4 class="font-bold text-gray-800 mb-2">Goal & Mindset</h4>
+                            <p class="text-gray-600 leading-relaxed">${data.content}</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-800 mb-2 text-sm uppercase">Key Tools</h4>
+                                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                    ${data.tools.map(t => `<li>${t}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                <h4 class="font-bold text-gray-800 mb-1 text-sm uppercase">Key Phrase</h4>
+                                <p class="text-emerald-700 italic font-serif text-lg">${data.phrase}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterTools() {
+            const filter = document.getElementById('tool-filter').value;
+            renderTools(filter);
+        }
+
+        function renderTools(filter) {
+            const grid = document.getElementById('tools-grid');
+            grid.innerHTML = '';
+            
+            const filteredData = filter === 'all' ? toolsData : toolsData.filter(t => t.category === filter);
+            
+            filteredData.forEach(tool => {
+                let iconClass = 'fa-toolbox';
+                let colorClass = 'bg-gray-100 text-gray-600';
+                
+                if(tool.category === 'understand') { iconClass = 'fa-eye'; colorClass = 'bg-red-100 text-red-600'; }
+                if(tool.category === 'explore') { iconClass = 'fa-compass'; colorClass = 'bg-blue-100 text-blue-600'; }
+                if(tool.category === 'build') { iconClass = 'fa-hammer'; colorClass = 'bg-purple-100 text-purple-600'; }
+
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <h4 class="font-bold text-gray-800 text-lg">${tool.title}</h4>
+                        <div class="w-8 h-8 rounded-full ${colorClass} flex items-center justify-center text-xs">
+                            <i class="fa-solid ${iconClass}"></i>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">${tool.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderCheatSheet() {
+            const grid = document.getElementById('cheat-grid');
+            grid.innerHTML = '';
+            
+            cheatSheetData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'flip-card';
+                card.setAttribute('onclick', 'this.classList.toggle("flipped")');
+                card.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div>
+                                <span class="block text-xs font-bold text-gray-400 mb-2">Question ${index + 1}</span>
+                                <p class="font-medium text-lg">${item.q}</p>
+                                <p class="text-xs text-gray-400 mt-4">(Click to reveal)</p>
+                            </div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div>
+                                <i class="fa-solid fa-check-circle text-3xl mb-2 text-emerald-200"></i>
+                                <p class="font-bold text-lg">${item.a}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function resetCards() {
+            document.querySelectorAll('.flip-card').forEach(el => el.classList.remove('flipped'));
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            const btn = document.getElementById('mobile-menu-btn');
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                menu.setAttribute('aria-hidden', 'false');
+                btn.setAttribute('aria-expanded', 'true');
+                // animate panel in
+                requestAnimationFrame(() => panel.classList.add('open'));
+                // focus first actionable element in menu
+                const focusable = menu.querySelector('button, [href], input, select, textarea');
+                if (focusable) focusable.focus();
+            } else {
+                // animate out then hide
+                panel.classList.remove('open');
+                menu.setAttribute('aria-hidden', 'true');
+                btn.setAttribute('aria-expanded', 'false');
+                setTimeout(() => menu.classList.add('hidden'), 220);
+                btn.focus();
+            }
+        }
+
+        // Accessibility: close mobile menu on Escape
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const menu = document.getElementById('mobile-menu');
+                if (!menu.classList.contains('hidden')) toggleMobileMenu();
+            }
+        });
+
+        // Ensure mobile menu button toggles with keyboard (Enter/Space handled by button automatically), and set initial nav active state
+        document.addEventListener('DOMContentLoaded', () => {
+            const navDashboard = document.getElementById('nav-dashboard');
+            if (navDashboard) navDashboard.classList.add('active-nav-item');
+        });
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // --- Chart Rendering ---
+
+        function renderOverviewChart() {
+            const ctx = document.getElementById('overviewChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Foundation (Stages)', 'Tools', 'Strategy & IT', 'Workshop'],
+                    datasets: [{
+                        data: [35, 20, 25, 20],
+                        backgroundColor: ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function renderInnovationMatrix() {
+            // Plotly Canvas Chart for Innovation Types
+            const data = [
+                {
+                    x: [1, 3], // Technology Impact (Low to High)
+                    y: [1, 1], // Market Impact (Low)
+                    mode: 'markers+text',
+                    type: 'scatter',
+                    name: 'Sustaining',
+                    text: ['Incremental', 'Modular'],
+                    textposition: 'top center',
+                    marker: { size: 40, color: ['#93C5FD', '#60A5FA'] } // Blue
+                },
+                {
+                    x: [1, 3], 
+                    y: [3, 3], // Market Impact (High)
+                    mode: 'markers+text',
+                    type: 'scatter',
+                    name: 'Disruptive',
+                    text: ['Architectural', 'Radical'],
+                    textposition: 'top center',
+                    marker: { size: 40, color: ['#FCA5A5', '#EF4444'] } // Red
+                }
+            ];
+
+            const layout = {
+                title: { text: 'Innovation Matrix', font: { family: 'Inter', size: 16 } },
+                xaxis: { 
+                    title: 'Technology Newness →', 
+                    range: [0, 4], 
+                    showgrid: true, 
+                    zeroline: false,
+                    tickvals: [1, 3],
+                    ticktext: ['Low', 'High']
+                },
+                yaxis: { 
+                    title: 'Market Impact →', 
+                    range: [0, 4], 
+                    showgrid: true, 
+                    zeroline: false,
+                    tickvals: [1, 3],
+                    ticktext: ['Low', 'High']
+                },
+                margin: { t: 40, l: 50, r: 20, b: 50 },
+                hovermode: 'closest',
+                dragmode: false
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+
+            Plotly.newPlot('innovationMatrix', data, layout, config);
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>

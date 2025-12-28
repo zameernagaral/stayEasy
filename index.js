@@ -49,7 +49,6 @@ app.use(flash());
 app.use((req, res, next) => {
     // expose flash messages to all templates via res.locals
     res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
     res.locals.danger = req.flash('danger');
     next(); 
 })
