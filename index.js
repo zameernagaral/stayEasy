@@ -53,7 +53,7 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategyocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -61,7 +61,14 @@ app.use((req, res, next) => {
     // expose flash messages to all templates via res.locals
     res.locals.success = req.flash('success');
     res.locals.danger = req.flash('danger');
+    res.locals.error = req.flash('error');
     next(); 
+})
+
+app.get('/demouser', async(req, res) => {
+    let fakeUser = new User({ username: 'demouser', email: 'demouser@gmail.com' });
+    let registeredUser = await User.register(fakeUser, 'password');
+    res.send(registeredUser);
 })
     app.use('/listings', listingRouter);
     app.use('/listings/:id/reviews', reviewRouter);
