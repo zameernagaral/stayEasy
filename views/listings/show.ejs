@@ -8,29 +8,28 @@
   <img src="<%= listing.image %>" class="card-img-top showImg" alt="listing_image" >
   <br>
   <div class="card-body">
-     
-         <p><%= listing.description %></p>
-         <p>
-  &#8377; 
+        <p class="card-text">Owned by <i><%= listing.owner.username %></i></p>
+          
+         <p class="card-text"><%= listing.description %></p>
+ <p class="card-text"> &#8377; 
   <% if (listing.price != null) { %>
     <%= listing.price.toLocaleString("en-IN") %>
   <% } else { %>
     N/A
   <% } %>
-</p>
-         <p><%= listing.location %></p>
-         <p><%= listing.country %></p>
-        </div>
+ </p>
 
-        <div>
-         <form action="/listings/<%= listing._id %>/edit">
-             <button class="newBtn btn btn-primary">Edit the listing</button>
-         </form>
-         <br>
+         <p class="card-text"><%= listing.location %></p>
+         <p class="card-text"><%= listing.country %></p>
+  
+        
+        <div class="btns">
+          <div class="d-flex col gap-2">
+         <a href="/listings/<%= listing._id %>/edit" class="btn btn-primary newBtn">Edit</a>
          <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
-             <button class="newBtn btn btn-primary">Delete the listing</button>
+             <button class="btn btn-primary newBtn">Delete</button>
          </form>
-         
+         </div>
         </div>
       
   </div>
