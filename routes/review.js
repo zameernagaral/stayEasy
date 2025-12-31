@@ -9,17 +9,18 @@ const Listing = require('../models/listing');
 const wrapAsync = require('../utils/wrapAsync.js');
 
 const Review = require('../models/reviews.js');
-const {validateReview} = require('../middleware.js');
+const {validateReview, isLoggedIn, isAuthor} = require('../middleware.js');
 
 
 
 
 //reviews
 //post route
-router.post('/',validateReview,wrapAsync(async (req, res, next) => {
+router.post('/',isLoggedIn,validateReview,wrapAsync(async (req, res, next) => {
     let { id } = req.params;
     let listing = await Listing.findById(id);
     let newReview = new Review(req.body.review);
+    newReview.author = res.locals.currentUser._id;
     listing.reviews.push(newReview);
     await newReview.save();
     await listing.save();
@@ -29,7 +30,7 @@ router.post('/',validateReview,wrapAsync(async (req, res, next) => {
 }))
 //delete reviews
 //delete route
-router.delete('/:reviewId', wrapAsync(async (req, res, next) => {
+router.delete('/:reviewId',isLoggedIn, isAuthor,wrapAsync(async (req, res, next) => {
     let { id, reviewId } = req.params;
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);

@@ -12,14 +12,8 @@ const {isLoggedIn, isOwner} = require('../middleware.js');
 const {validateListing} = require('../middleware.js');
 
 
-
-router.get('/', (req, res) => {
-    Listing.find()
-        .then(listings => {
-            res.render('listings/index', { listings });
-        })
-        .catch(err => console.log(err));
-});
+//index route
+router.get('/', wrapAsync());
 
 //new route
 router.get('/new', isLoggedIn ,(req, res) => {
@@ -73,7 +67,7 @@ router.put('/:id', isLoggedIn,isOwner,validateListing, wrapAsync(async (req, res
 //Show Route
 router.get('/:id', wrapAsync(async (req, res, next) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate('reviews').populate('owner');
+    const listing = await Listing.findById(id).populate({path:'reviews',populate: {path:'author'}}).populate('owner');
     if(!listing){
         req.flash("danger", "Listing not found");
         return res.redirect('/listings');
