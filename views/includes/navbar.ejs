@@ -18,6 +18,16 @@ quick_reference_all
 </span><span class="align-top">All Listings</span></a>
         <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus"></i>Add New Listings</a>
       </div>
+      <div class="navbar-nav ms-auto">
+        <% if(!currentUser){ %>
+        <a class="nav-link" href="/signup">Signup</a>
+        <a class="nav-link" href="/login">
+          <span class="align-top">Login</span></a>
+          <% } %>
+          <% if(currentUser){ %>
+        <a class="nav-link" href="/logout">Logout</a>
+        <% } %>
+      </div>
     </div>
   </div>
 </nav>
