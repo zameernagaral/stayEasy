@@ -20,7 +20,8 @@ module.exports.showListing = async (req, res, next) => {
     res.render('listings/show', { listing });
 }
 module.exports.createListing = async (req, res , next) => {
-   
+   let url = req.file.path;
+   let filename = req.file.filename;
     const newlisting = new Listing(req.body.listing);
     newlisting.owner = req.user._id;
     await newlisting.save();
