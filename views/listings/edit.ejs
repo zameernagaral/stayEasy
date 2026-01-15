@@ -3,7 +3,7 @@
     
     <h1 class="mt-5">Edit the listing</h1>
     <br>
-    <form action="/listings/<%= listing._id %>?_method=PUT" method="post" class="needs-validation" novalidate>
+    <form action="/listings/<%= listing._id %>?_method=PUT" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
         <div class="row">
             <div>
         <label for="title" class="form-label">Title</label>
@@ -19,14 +19,11 @@
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a description</div>
         </div>
-        <div>
 
-        
+        <div>
         <label for="image" class="form-label">Image</label>
-        <input type="text" name="listing[image]" id="image" value="<%= listing.image %>" class="form-control" 
-        required>
+        <input type="file" name="listing[image]" id="image" class="form-control" >
         <div class="valid-feedback">Looks good!</div>
-        <div class="invalid-feedback">Please enter a image</div>
         </div>
         <div>
 
@@ -35,12 +32,12 @@
         <input type="number" name="listing[price]" id="price" value="<%= listing.price %>" class="form-control" required>
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a price</div>
-        </div>
         <div>
         <label for="location" class="form-label">Location</label>
         <input type="text" name="listing[location]" id="location" value="<%= listing.location %>" class="form-control" required>
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a location</div>
+        </div>
         </div>
         <div>
         <label for="country" class="form-label">Country</label>

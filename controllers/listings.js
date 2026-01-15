@@ -36,15 +36,21 @@ module.exports.renderEditForm = async (req, res, next) => {
         req.flash("danger", "Listing not found");
         return res.redirect('/listings');
     }
+
     res.render('listings/edit', { listing });
 }
 module.exports.updateListing = async (req, res) => {
-  
+  let { id } = req.params;
   const listing = await Listing.findByIdAndUpdate(
     id,
     req.body.listing, // ✅ FIX
     { runValidators: true, new: true }
   );
+  if(typeof req.file !== 'undefined'){
+     let url = req.file.path;
+   let filename = req.file.filename;
+   listing.image = {url,filename};
+  }
   req.flash("success", "Successfully updated a listing");
   res.redirect(`/listings/${listing._id}`);
 }
