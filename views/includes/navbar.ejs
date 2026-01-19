@@ -13,11 +13,23 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-link" href="/"><i class="fa-regular fa-house"></i> Home</a>
-        <a class="nav-link" href="/listings"><span class="material-symbols-outlined">
-quick_reference_all
-</span><span class="align-top">All Listings</span></a>
+        
         <a class="nav-link" href="/listings/new"><i class="fa-solid fa-plus"></i>Add New Listings</a>
       </div>
+    
+      <form action="/listings/search" method="get" class="search-form">
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <input
+      type="text"
+      name="q"
+      id="search"
+      placeholder="Search listings..."
+      aria-label="Search listings"
+    />
+  </div>
+</form>
+
       <div class="navbar-nav ms-auto">
         <% if(!currentUser){ %>
         <a class="nav-link" href="/signup">Signup</a>

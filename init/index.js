@@ -6,7 +6,7 @@ main()
 .then(() => console.log('Database connected'))
 .catch(err => console.log(err));
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/stayeasy');
+    await mongoose.connect("mongodb+srv://Stayeasy:OOVaD55psuy95nsc@cluster0.nlymnm0.mongodb.net/?appName=Cluster0");
     
 }
 const initDB = async () => {

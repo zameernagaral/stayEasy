@@ -1,5 +1,83 @@
 <% layout('layouts/boilerplate') %>
 <body>
+  <div class="filters">
+<form action="/listings/filter" method="get">
+  <p>Filter <i class="fa-solid fa-filter"></i></p>
+
+  <button
+    type="submit"
+    name="category"
+    value="all"
+    class="filter-btn <%= category === 'all' ? 'active' : '' %>">
+    <i class="fa-solid fa-globe"></i> All
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="beach"
+    class="filter-btn <%= category === 'beach' ? 'active' : '' %>">
+    <i class="fa-solid fa-umbrella-beach"></i> Beach
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="mountain"
+    class="filter-btn <%= category === 'mountain' ? 'active' : '' %>">
+    <i class="fa-solid fa-mountain"></i> Mountain
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="forest"
+    class="filter-btn <%= category === 'forest' ? 'active' : '' %>">
+    <i class="fa-solid fa-tree"></i> Forest
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="city"
+    class="filter-btn <%= category === 'city' ? 'active' : '' %>">
+    <i class="fa-solid fa-city"></i> City
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="landmark"
+    class="filter-btn <%= category === 'landmark' ? 'active' : '' %>">
+    <i class="fa-solid fa-landmark"></i> Landmark
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="snow"
+    class="filter-btn <%= category === 'snow' ? 'active' : '' %>">
+    <i class="fa-solid fa-snowflake"></i> Snow
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="nature"
+    class="filter-btn <%= category === 'nature' ? 'active' : '' %>">
+    <i class="fa-solid fa-leaf"></i> Nature
+  </button>
+
+  <button
+    type="submit"
+    name="category"
+    value="urban"
+    class="filter-btn <%= category === 'urban' ? 'active' : '' %>">
+    <i class="fa-solid fa-building"></i> Urban
+  </button>
+</form>
+
+  </div>
   <h1>All Listings</h1>
   <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
     <% for( let listing of listings ) { %>

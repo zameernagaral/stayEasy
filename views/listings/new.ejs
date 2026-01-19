@@ -38,6 +38,25 @@
         <div class="invalid-feedback">Please enter a price</div>
       </div>
       <div class="col-8">
+  <label for="category" class="form-label">Category</label>
+
+  <select name="listing[category]" id="category" class="form-select" required>
+    <option value="">Select category</option>
+    <option value="beach">Beach</option>
+    <option value="mountain">Mountain</option>
+    <option value="city">City</option>
+    <option value="historic">Landmark</option>
+    <option value="forest">Forest</option>
+    <option value="snow">Snow</option>
+    <option value="nature">Nature</option>
+    <option value="urban">Urban</option>
+  </select>
+
+  <div class="valid-feedback">Looks good!</div>
+  <div class="invalid-feedback">Please select a category</div>
+</div>
+
+      <div class="col-4">
         <label for="location" class="form-label">Location</label>
   <input type="text" name="listing[location]" id="location" class="form-control" 
         placeholder="Location"
@@ -45,7 +64,7 @@
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a location</div>
       </div>
-      <div>
+      <div class="col-8">
         <label for="country" class="form-label">Country</label>
   <input type="text" name="listing[country]" id="country" class="form-control" 
         placeholder="Country"

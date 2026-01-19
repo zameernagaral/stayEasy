@@ -7,10 +7,13 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const methodOverride = require('method-override');
-const Mongo_URL = 'mongodb://127.0.0.1:27017/stayeasy';
+const Mongo_URL = process.env.MONGO_URL;
 const ejsMate = require('ejs-mate');
 const ExpressError = require('./utils/ExpressError.js');
 const session = require('express-session');
+const MongoStore = require("connect-mongo");
+
+
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -21,6 +24,7 @@ const listingRouter = require("./routes/listing");
 const reviewRouter = require("./routes/review");
 const userRouter = require("./routes/user");
 const { ifError } = require('assert');
+const { create } = require('./models/reviews.js');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -38,8 +42,18 @@ main()
 async function main() {
     await mongoose.connect(Mongo_URL);
 }
+
+const store = MongoStore.create({
+  mongoUrl: process.env.MONGO_URL,
+  crypto: {
+    secret: process.env.SECRET,
+  },
+  touchAfter: 24 * 3600, // time in seconds
+});
+
 const sessionOptions = {
-    secret: 'thisshouldbeabettersecret!',
+    store,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {

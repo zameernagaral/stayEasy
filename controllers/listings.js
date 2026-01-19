@@ -1,10 +1,41 @@
+const { number } = require("joi");
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
     const listings = await Listing.find({})
-        res.render("listings/index.ejs", { listings });
+        res.render("listings/index.ejs", { listings,category: "all" });
 }
 
+module.exports.filterListing = async (req, res) => {
+  const { category } = req.query;
+
+  if (!category || category === "all") {
+    const listings = await Listing.find({});
+    return res.render("listings/index.ejs", {
+      listings,
+      category: "all",
+    });
+  }
+
+  const listings = await Listing.find({ category });
+  res.render("listings/index.ejs", {
+    listings,
+    category,
+  });
+};
+
+module.exports.searchListing = async (req, res) => {
+   const { q } = req.query;
+  const listings = await Listing.find({
+    $or: [
+      { title: { $regex: q, $options: "i" } },
+      { location: { $regex: q, $options: "i" } },
+      { category: { $regex: q, $options: "i" } }
+    ]
+  });
+
+  res.render("listings/index", { listings });
+}
 module.exports.renderNewForm = (req, res) => {
 
     res.render('listings/new.ejs');
@@ -36,8 +67,9 @@ module.exports.renderEditForm = async (req, res, next) => {
         req.flash("danger", "Listing not found");
         return res.redirect('/listings');
     }
-
-    res.render('listings/edit', { listing });
+let originalImageUrl = listing.image.url;
+originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_400");
+    res.render('listings/edit', { listing,originalImageUrl });
 }
 module.exports.updateListing = async (req, res) => {
   let { id } = req.params;
