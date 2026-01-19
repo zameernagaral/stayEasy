@@ -2,9 +2,13 @@ const { number } = require("joi");
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
-    const listings = await Listing.find({})
-        res.render("listings/index.ejs", { listings,category: "all" });
-}
+  const listings = await Listing.find({});
+  return res.render("listings/index.ejs", {
+    listings,
+    category: "all",
+  });
+};
+
 
 module.exports.filterListing = async (req, res) => {
   const { category } = req.query;
@@ -17,11 +21,12 @@ module.exports.filterListing = async (req, res) => {
     });
   }
 
-  const listings = await Listing.find({ category });
-  res.render("listings/index.ejs", {
-    listings,
-    category,
-  });
+ const listings = await Listing.find({ category });
+return res.render("listings/index.ejs", {
+  listings,
+  category,
+});
+
 };
 
 module.exports.searchListing = async (req, res) => {
@@ -34,7 +39,11 @@ module.exports.searchListing = async (req, res) => {
     ]
   });
 
-  res.render("listings/index", { listings });
+  return res.render("listings/index", {
+  listings,
+  category: "all", // important
+});
+
 }
 module.exports.renderNewForm = (req, res) => {
 
