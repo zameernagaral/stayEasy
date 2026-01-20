@@ -1,6 +1,13 @@
 <% layout('layouts/boilerplate') %>
 <body>
-  <div class="filters">
+  <!-- Mobile Filter Trigger -->
+<button class="mobile-filter-btn" id="openFilters">
+  <i class="fa-solid fa-sliders"></i>
+  Filters
+</button>
+
+ <div class="filters filter-panel" id="filterPanel">
+
 <form action="/listings/filter" method="get">
   <p>Filter <i class="fa-solid fa-filter"></i></p>
 
@@ -82,12 +89,11 @@
   <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
     <% for( let listing of listings ) { %>
     <a href="/listings/<%= listing._id %>" class="text-decoration-none">
-      <div class="card col listing-card" style="width: 20rem">
+      <div class="card col listing-card">
         <img
           src="<%= listing.image.url %>"
           class="card-img-top"
           alt="listing_image"
-          style="height: 20rem"
         />
         <div class="card-img-overlay">
           <h5 class="card-title">
@@ -108,3 +114,13 @@
     <% } %>
   </div>
 </body>
+<script>
+  const openBtn = document.getElementById("openFilters");
+  const panel = document.getElementById("filterPanel");
+
+  if (openBtn && panel) {
+    openBtn.addEventListener("click", () => {
+      panel.classList.toggle("active");
+    });
+  }
+</script>

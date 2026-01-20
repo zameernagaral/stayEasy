@@ -1,82 +1,142 @@
 <% layout('layouts/boilerplate') %>
-<body>
-  <h1 class="mt-5">Create New Listing</h1>
-  <br />
-  <form action="/listings" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
-    <div class="row">
-      <div>
+
+<section class="container mt-5 new-listing-page">
+
+  <header class="mb-4">
+    <h1 class="fw-semibold">Create New Listing</h1>
+    <p class="text-muted">Share your space with the world</p>
+  </header>
+
+  <form
+    action="/listings"
+    method="post"
+    class="needs-validation"
+    novalidate
+    enctype="multipart/form-data"
+  >
+    <div class="row g-4">
+
+      <!-- TITLE -->
+      <div class="col-12">
         <label for="title" class="form-label">Title</label>
-  <input type="text" name="listing[title]" id="title" class="form-control" placeholder="Title" required />
+        <input
+          type="text"
+          name="listing[title]"
+          id="title"
+          class="form-control"
+          placeholder="Cozy beachside apartment"
+          required
+        />
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a title</div>
       </div>
-      <div>
+
+      <!-- DESCRIPTION -->
+      <div class="col-12">
         <label for="description" class="form-label">Description</label>
         <input
           type="text"
           name="listing[description]"
           id="description"
           class="form-control"
-          placeholder="Description"
+          placeholder="A peaceful stay near the ocean..."
           required
         />
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a description</div>
-    </div>
-      
-      <div>
-        <label for="image" class="form-label">Image(Optional)</label>
-  <input type="file" name="listing[image]" id="image" class="form-control"  />
-        
       </div>
-      <div class="col-4">
-        <label for="price" class="form-label">Price</label>
-  <input type="number" name="listing[price]" id="price" class="form-control" 
-        placeholder="Price"
-        required/>
+
+      <!-- IMAGE -->
+      <div class="col-12">
+        <label for="image" class="form-label">Image (optional)</label>
+        <input
+          type="file"
+          name="listing[image]"
+          id="image"
+          class="form-control"
+        />
+      </div>
+
+      <!-- PRICE -->
+      <div class="col-md-4">
+        <label for="price" class="form-label">Price (per night)</label>
+        <input
+          type="number"
+          name="listing[price]"
+          id="price"
+          class="form-control"
+          placeholder="₹ 2,500"
+          required
+        />
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a price</div>
       </div>
-      <div class="col-8">
-  <label for="category" class="form-label">Category</label>
 
-  <select name="listing[category]" id="category" class="form-select" required>
-    <option value="">Select category</option>
-    <option value="beach">Beach</option>
-    <option value="mountain">Mountain</option>
-    <option value="city">City</option>
-    <option value="historic">Landmark</option>
-    <option value="forest">Forest</option>
-    <option value="snow">Snow</option>
-    <option value="nature">Nature</option>
-    <option value="urban">Urban</option>
-  </select>
+      <!-- CATEGORY -->
+      <div class="col-md-8">
+        <label for="category" class="form-label">Category</label>
+        <select
+          name="listing[category]"
+          id="category"
+          class="form-select"
+          required
+        >
+          <option value="">Select category</option>
+          <option value="beach">Beach</option>
+          <option value="mountain">Mountain</option>
+          <option value="city">City</option>
+          <option value="landmark">Landmark</option>
+          <option value="forest">Forest</option>
+          <option value="snow">Snow</option>
+          <option value="nature">Nature</option>
+          <option value="urban">Urban</option>
+        </select>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please select a category</div>
+      </div>
 
-  <div class="valid-feedback">Looks good!</div>
-  <div class="invalid-feedback">Please select a category</div>
-</div>
-
-      <div class="col-4">
+      <!-- LOCATION -->
+      <div class="col-md-4">
         <label for="location" class="form-label">Location</label>
-  <input type="text" name="listing[location]" id="location" class="form-control" 
-        placeholder="Location"
-        required />
+        <input
+          type="text"
+          name="listing[location]"
+          id="location"
+          class="form-control"
+          placeholder="Goa"
+          required
+        />
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a location</div>
       </div>
-      <div class="col-8">
+
+      <!-- COUNTRY -->
+      <div class="col-md-8">
         <label for="country" class="form-label">Country</label>
-  <input type="text" name="listing[country]" id="country" class="form-control" 
-        placeholder="Country"
-        required />
+        <input
+          type="text"
+          name="listing[country]"
+          id="country"
+          class="form-control"
+          placeholder="India"
+          required
+        />
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter a country</div>
-
-        <br />
       </div>
+
     </div>
-    <button type="submit" class="btn newBtn btn-secondary">Submit</button>
+
+    <!-- ACTIONS -->
+    <div class="d-flex gap-3 mt-4">
+      <button type="submit" class="btn newBtn">
+        Create Listing
+      </button>
+
+      <a href="/" class="btn btn-outline-secondary">
+        Cancel
+      </a>
+    </div>
   </form>
-  <br />
-  <a href="/"><button class="btn newBtn btn-secondary">Back</button></a>
-</body>
+
+</section>
