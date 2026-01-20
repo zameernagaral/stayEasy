@@ -751,3 +751,81 @@ footer {
     justify-content: center;
   }
 }
+/* =========================================
+   MOBILE NAVBAR IMPROVEMENTS
+   ========================================= */
+
+/* 1. Fix the Toggler Button (Hamburger) */
+.navbar-toggler {
+  border: none !important; /* Removes the ugly box border */
+  padding: 0.5rem;
+  outline: none;
+  box-shadow: none !important; /* Removes the blue glow on click */
+}
+
+.navbar-toggler-icon {
+  /* Optional: simple filter to make the icon slightly darker/sharper */
+  filter: contrast(1.5); 
+}
+
+/* 2. Style the Dropdown Menu (Mobile Only) */
+@media (max-width: 767px) {
+  
+  /* Make the menu look like a floating card */
+  .navbar-collapse {
+    position: absolute;
+    top: 100%; /* Right below the navbar */
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0 0 20px 20px; /* Round bottom corners only */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1); /* Deep shadow */
+    border-top: 1px solid #f0f0f0;
+    z-index: 1000;
+  }
+
+  /* Center the links and make them big for tapping */
+  .navbar-nav .nav-link {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #f8f8f8;
+  }
+
+  /* Remove border from last link */
+  .navbar-nav .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  /* Fix Search Bar Spacing in Mobile */
+  .search-form {
+    margin: 1.5rem 0; /* Add space above and below search */
+    width: 100%;
+  }
+  
+  .search-box input {
+    /* Ensure search input doesn't overflow */
+    width: 100%;
+    box-sizing: border-box; 
+  }
+
+  /* Style the buttons (Login/Signup) in mobile to look like pills */
+  .navbar-nav.ms-auto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .navbar-nav.ms-auto .nav-link {
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    border: none;
+  }
+  
+  .navbar-nav.ms-auto .nav-link:hover {
+    background-color: #fe424f;
+    color: white;
+  }
+}
