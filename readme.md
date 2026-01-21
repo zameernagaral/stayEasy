@@ -1,4 +1,4 @@
-# StayEasy 🏡
+# StayEasy
 
 **StayEasy** is an Airbnb-inspired room listing platform built using **Node.js, Express, MongoDB, and EJS**.
 It focuses on clean architecture, server-side rendering, authentication, and real-world backend practices.
@@ -7,7 +7,7 @@ This project was built to understand how full-stack web applications work end-to
 
 ---
 
-## 🌍 Overview
+## Overview
 
 StayEasy allows users to explore rental listings, create their own listings, and leave reviews — all through a clean, familiar interface inspired by Airbnb.
 
@@ -20,7 +20,7 @@ The project emphasizes:
 
 ---
 
-## ✨ Features
+## Features
 
 * **User Authentication**
 
@@ -54,7 +54,7 @@ The project emphasizes:
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 * **Backend:** Node.js, Express
 * **Database:** MongoDB, Mongoose
@@ -65,7 +65,7 @@ The project emphasizes:
 
 ---
 
-## ⚠️ Important Setup Notes
+## Important Setup Notes
 
 You **must** configure environment variables before running the app.
 
@@ -81,7 +81,7 @@ CLOUD_API_SECRET=your_cloudinary_api_secret
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 1. **Clone the repository**
 
@@ -110,7 +110,7 @@ http://localhost:8080
 
 ---
 
-## 🧪 Add Initial Dummy Data (Optional)
+## Add Initial Dummy Data (Optional)
 
 To seed the database with sample listings:
 
@@ -121,7 +121,7 @@ node index.js
 
 ---
 
-## 🚀 Learning Outcomes
+## Learning Outcomes
 
 This project helped solidify understanding of:
 
@@ -133,7 +133,7 @@ This project helped solidify understanding of:
 
 ---
 
-## 📌 Future Improvements
+## Future Improvements
 
 * Pagination for listings
 * Role-based access (admin)
@@ -143,7 +143,7 @@ This project helped solidify understanding of:
 
 ---
 
-## 📄 License
+## License
 
 This project is for learning and demonstration purposes.
 
