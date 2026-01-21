@@ -87,7 +87,7 @@
   </div>
   <h1>All Listings</h1>
   <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-    <% for( let listing of listings ) { %>
+    <% for( let listing of listings.slice().reverse() ) { %>
     <a href="/listings/<%= listing._id %>" class="text-decoration-none">
       <div class="card col listing-card">
         <img
