@@ -805,12 +805,11 @@ footer {
   }
   
   .search-box input {
-    /* Ensure search input doesn't overflow */
+
     width: 100%;
     box-sizing: border-box; 
   }
 
-  /* Style the buttons (Login/Signup) in mobile to look like pills */
   .navbar-nav.ms-auto {
     display: flex;
     flex-direction: column;

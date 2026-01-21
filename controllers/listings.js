@@ -11,9 +11,6 @@ module.exports.index = async (req, res) => {
   });
 };
 
-/**
- * FILTER LISTINGS BY CATEGORY
- */
 module.exports.filterListing = async (req, res) => {
   const { category } = req.query;
 

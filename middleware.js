@@ -3,9 +3,7 @@ const Review = require("./models/reviews");
 const ExpressError = require("./utils/ExpressError");
 const { listingSchema, reviewSchema } = require("./schema");
 
-/* ======================
-   AUTHENTICATION
-====================== */
+
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.session.returnTo = req.originalUrl;

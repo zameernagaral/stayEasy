@@ -15,4 +15,5 @@ const initDB = async () => {
 
     await Listing.insertMany(initData.data);
 }
+
 initDB();
